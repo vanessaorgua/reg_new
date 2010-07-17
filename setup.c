@@ -15,11 +15,12 @@
 /* Maximum length of a line: 6  byte */
 /* In total byte: 20                 */
 /* FileName: вK                      */
-prog_char menu[3][20]=
+prog_char menu[4][20]=
 {
 {66,120,111,227,184,0}, /* [0] "Входи"  */
 {66,184,120,111,227,184,0}, /* [1] "Виходи" */
-{65,227,112,101,99,97,0} /* [2] "Адреса" */
+{65,227,112,101,99,97,0}, /* [2] "Адреса" */
+"Out select"
 };
 
 extern char s[34];
@@ -36,7 +37,9 @@ char readkey()
 void setup_adc_();
 void setup_dac_();
 void setup_addr();
+void setup_outsel();
 
+void calc();
 
 void setup()
 {
@@ -51,10 +54,10 @@ void setup()
 		switch(readkey())
 		{
 			case MIN:
-				if(--i&0x80) i=2;
+				if(--i&0x80) i=3;
 				break;
 			case MAX:
-				if(++i>2) i=0;
+				if(++i>3) i=0;
 				break;
 				
 			case STOP:
@@ -68,10 +71,11 @@ void setup()
 					case 1:
 						setup_dac_();
 						break;
-						setup_addr();
 					case 2:
-						
+						setup_addr();
 						break;
+					case 3:
+					  setup_outsel();
 				}
 		}
 		
@@ -275,3 +279,59 @@ void setup_addr()
   }
   
 }
+
+prog_char mode[3][20]={"4-20mA","0-20mA","---"};
+
+void setup_out_modesel(char v)
+{
+  char i=eeprom_read_byte(dac_m+v);
+  while(1)
+  {
+	put_lcd_P(mode[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		eeprom_write_byte(dac_m+v,i);
+	  case STOP:
+		return ;
+	}
+  }
+
+}
+
+void setup_outsel()
+{
+  char i=0;
+  while(1)
+  {
+	put_lcd_P(menu[3],0);
+	sprintf_P(s,PSTR("Channel %d"),i+1);
+	put_lcd(s,1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		  put_lcd(s,0);
+		  setup_out_modesel(i);
+		  calc();
+		  break;
+	  case STOP:
+		return;
+	}
+  }
+}
+
+
+
+

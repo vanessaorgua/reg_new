@@ -34,11 +34,15 @@ OBJECTS	= $(subst $(space),$(comma),$(OBJLIST) )
 
 
 
-all: hex lss ehex size
+all: hex lss size
+
 
 
 prog: $(TARGET).hex
 	avrdude -p m32 -P /dev/ttyS0 -c ponyser -U flash:w:$(TARGET).hex -U eeprom:w:$(TARGET)_eeprom.hex
+
+eeread:
+	avrdude -p m32 -P /dev/ttyS0 -c ponyser -U eeprom:r:$(TARGET)_eeprom.hex
 
 fuse: lfuse.bin hfuse.bin
 	avrdude -p m32 -P /dev/ttyS0 -c ponyser -U lfuse:w:lfuse.bin:r -U hfuse:w:hfuse.bin:r
