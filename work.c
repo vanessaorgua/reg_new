@@ -39,7 +39,7 @@ extern
 #endif
 sca_k[8];
 
-extern unsigned int dac[2]; // Сигнал токового виходу.
+extern int dac[2]; // Сигнал токового виходу.
 
 extern 
 #if BASE == 16
@@ -53,6 +53,11 @@ extern int dac_o[2];
 
 unsigned int f[8][16];
 unsigned char c_d=1;
+
+#define UP_1 PD4
+#define DW_1 PD5
+#define UP_2 PD6
+#define DW_2 PD7
 
 SIGNAL(SIG_OUTPUT_COMPARE1A)
 {				
@@ -121,6 +126,66 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
 		PORTB &=~_BV(LOAD);
 		PORTB |= _BV(LOAD);
+//управління пепі
+// алгоритм із старої байпаски
+// tmp  - завдання
+// tmp1 - управління
+//		UP_1 |= tmp1>tmp; // це включає виход
+//		UP_1 &= tmp1>(tmp-zone[j]); // це виключає виход
+//		DW_1 |= tmp1<=tmp; //!(tmp1>tmp)
+//		DW_1 &= tmp1<(tmp+zone[j]); 
+  //i=PORTD; // прочитати значеня порту
+
+/* Алгоримт імені гранківського
+  if(ai[1]<dac[0]-60) // включити набор
+	PORTD |= _BV(UP_1);
+
+  if(ai[1]>dac[0]) // виключити набор
+	PORTD &=~_BV(UP_1);
+
+  if(ai[1]>dac[0]+60) // включити набор
+	PORTD |=_BV(DW_1);
+  if(ai[1]<dac[0]) // виключити набор
+	PORTD &=~_BV(DW_1);
+
+
+  if(ai[3]<dac[1]-60) // включити набор
+	PORTD |= _BV(UP_2);
+
+  if(ai[3]>dac[1]) // виключити набор
+	PORTD &=~_BV(UP_2);
+                    
+  if(ai[3]>dac[1]+60) // включити набор
+	PORTD |=_BV(DW_2);
+  if(ai[3]<dac[1]) // виключити набор
+	PORTD &=~_BV(DW_2);
+  */
+  // спрощений алгоритм імені Нечипоренка
+#define DELTA 40
+
+  if(ai[1]>dac[0]+DELTA)
+	sbi(PORTD,DW_1); // вклюсити стравлювання
+  else
+	cbi(PORTD,DW_1);
+
+  if(ai[1]<dac[0]-DELTA)
+	sbi(PORTD,UP_1); // включити набір
+  else
+	cbi(PORTD,UP_1); //
+
+
+  if(ai[3]>dac[1]+DELTA)
+	sbi(PORTD,DW_2); // вклюсити стравлювання
+  else
+	cbi(PORTD,DW_2);
+
+  if(ai[3]<dac[1]-DELTA)
+	sbi(PORTD,UP_2); // включити набір
+  else
+	cbi(PORTD,UP_2); //
+
+
+
 
 	return ;
 }

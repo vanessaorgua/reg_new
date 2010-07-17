@@ -148,7 +148,7 @@ void calibr_adc(unsigned char i)
 		sprintf_P(s,msg1,i+1,(int)sum);
 		put_lcd(s,0);
 		
-		sprintf_P(s,PSTR("hi=%4d lo=%4d"),hi,lo);
+		sprintf_P(s,PSTR("lo=%4d hi=%4d"),lo,hi);
 		put_lcd(s,1);
 		
 		switch(getkey())
