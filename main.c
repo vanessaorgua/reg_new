@@ -32,6 +32,8 @@ unsigned char EEMEM dac_m[2]={0,0}; // 0 -  "4-20" 1 - "0-20" 2..-"0-5"
 
 unsigned char EEMEM md[2]={0,0};
 int EEMEM val[2]={0,0};
+
+unsigned char EEMEM rev[2]={0,0};
  
 //---------------------------------------------------------------------------------------------------------------------------
 // Дан?в в ОЗУ
@@ -175,13 +177,12 @@ int main()
 	dac[0]=eeprom_read_word(val);
 	dac[1]=eeprom_read_word(val+1);
 
-	wdt_reset();	
+	wdt_reset();
 
 	sei();
 
 	while(1)
 	{
-
 		 
 		
 		sprintf(s," %3d%% %3d%%\01%3d%%%c",ai[0]/40,ai[1]/40,dac[0]/40,eeprom_read_byte(md)?'A':'P');

@@ -15,12 +15,13 @@
 /* Maximum length of a line: 6  byte */
 /* In total byte: 20                 */
 /* FileName: вK                      */
-prog_char menu[4][20]=
+prog_char menu[5][20]=
 {
 {66,120,111,227,184,0}, /* [0] "Входи"  */
 {66,184,120,111,227,184,0}, /* [1] "Виходи" */
 {65,227,112,101,99,97,0}, /* [2] "Адреса" */
-"Out select"
+"Out select",
+"Valve type"
 };
 
 extern char s[34];
@@ -38,6 +39,8 @@ void setup_adc_();
 void setup_dac_();
 void setup_addr();
 void setup_outsel();
+void setup_valve();
+
 
 void calc();
 
@@ -54,10 +57,10 @@ void setup()
 		switch(readkey())
 		{
 			case MIN:
-				if(--i&0x80) i=3;
+				if(--i&0x80) i=4;
 				break;
 			case MAX:
-				if(++i>3) i=0;
+				if(++i>4) i=0;
 				break;
 				
 			case STOP:
@@ -76,6 +79,10 @@ void setup()
 						break;
 					case 3:
 					  setup_outsel();
+					  break;
+					case 4:
+					  setup_valve();
+					  break;
 				}
 		}
 		
@@ -332,6 +339,55 @@ void setup_outsel()
   }
 }
 
+prog_char modevt[2][10]={"NO","NC"};
+
+void setup_vt(char v)
+{
+  char i=eeprom_read_byte(rev+v);
+  while(1)
+  {
+	put_lcd_P(modevt[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		eeprom_write_byte(rev+v,i);
+	  case STOP:
+		return ;
+	}
+  }
+}
 
 
 
+void setup_valve()
+{
+  char i=0;
+  while(1)
+  {
+	put_lcd_P(menu[4],0);
+	sprintf_P(s,PSTR("Channel %d"),i+1);
+	put_lcd(s,1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		  put_lcd(s,0);
+		  setup_vt(i);
+		  calc();
+		  break;
+	  case STOP:
+		return;
+	}
+  }
+}

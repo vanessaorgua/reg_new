@@ -73,7 +73,8 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
 		long sum;
 
-				
+		int out[2]; // це для розрахунку виходу
+		
 		cbi(PORTB,CSA);
 		SPI_send(0);
 		SPI_send(0);
@@ -102,10 +103,23 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 		++p;
 		p&=0x0f;	
 
+		// визначення роботи клапана НО-НЗ
+		if(eeprom_read_byte(rev))
+		  out[0]=4000-dac[0];
+		else
+		  out[0]=dac[0];
+
+		if(eeprom_read_byte(rev+1))
+		  out[1]=4000-dac[1];
+		else
+		  out[1]=dac[1];
+
+		  
+
 		if(c_d)
 		{
-			ao.i[0]=(unsigned int)(((long)dac_k[0]*(long)dac[0])>>BASE) + dac_o[0];
-			ao.i[1]=(unsigned int)(((long)dac_k[1]*(long)dac[1])>>BASE) + dac_o[1];
+			ao.i[0]=(unsigned int)(((long)dac_k[0]*(long)out[0])>>BASE) + dac_o[0];
+			ao.i[1]=(unsigned int)(((long)dac_k[1]*(long)out[1])>>BASE) + dac_o[1];
 		}
 		
 		cbi(PORTB ,CSD);
@@ -163,23 +177,23 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   // спрощений алгоритм імені Нечипоренка
 #define DELTA 40
 
-  if(ai[1]>dac[0]+DELTA)
+  if(ai[1]>out[0]+DELTA)
 	sbi(PORTD,DW_1); // вклюсити стравлювання
   else
 	cbi(PORTD,DW_1);
 
-  if(ai[1]<dac[0]-DELTA)
+  if(ai[1]<out[0]-DELTA)
 	sbi(PORTD,UP_1); // включити набір
   else
 	cbi(PORTD,UP_1); //
 
 
-  if(ai[3]>dac[1]+DELTA)
+  if(ai[3]>out[1]+DELTA)
 	sbi(PORTD,DW_2); // вклюсити стравлювання
   else
 	cbi(PORTD,DW_2);
 
-  if(ai[3]<dac[1]-DELTA)
+  if(ai[3]<out[1]-DELTA)
 	sbi(PORTD,UP_2); // включити набір
   else
 	cbi(PORTD,UP_2); //

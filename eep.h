@@ -10,5 +10,7 @@ extern unsigned int EEMEM dac_hi[2];
 extern unsigned char EEMEM dac_m[2]; // 0 -  "4-20" 1 - "0-20" 2..-"0-5"
 extern unsigned char EEMEM md[2];
 
+extern unsigned char EEMEM rev[2];
+
 #endif
 
