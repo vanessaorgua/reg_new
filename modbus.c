@@ -130,10 +130,10 @@ SIGNAL(SIG_OUTPUT_COMPARE0) //
 		return;
 	}
 
-	cbi(PORTD,PD4);
-	cbi(PORTD,PD5);
-	cbi(PORTD,PD6);
-	cbi(PORTD,PD7);
+//	cbi(PORTD,PD4);
+//	cbi(PORTD,PD5);
+//	cbi(PORTD,PD6);
+//	cbi(PORTD,PD7);
 
 	f=uart[1];
 	ptr=(unsigned int*)(uart+2);
