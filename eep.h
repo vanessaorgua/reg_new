@@ -12,5 +12,6 @@ extern unsigned char EEMEM md[2];
 
 extern unsigned char EEMEM rev[2];
 
+extern char EEMEM spd;
 #endif
 
