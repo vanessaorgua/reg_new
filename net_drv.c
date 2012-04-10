@@ -30,13 +30,14 @@ extern unsigned int dac[2]; // Сигнал токового виходу.
 void net_init()
 {
 // init uart
-	UCSRB=(_BV(RXCIE) | _BV(TXCIE) | _BV(RXEN) | _BV(TXEN) ); // 
+	sbi(DDRA,DDA1);
+	RX_EN();
+
+	UCSRB=(_BV(RXCIE) | _BV(TXCIE) | _BV(RXEN) ); // 
 	UBRRL=pgm_read_byte(sp+eeprom_read_byte(&spd));
 
-	sbi(DDRA,DDA1);
 //	cbi(PORTA,PA1);
 //	DDRD |= _BV(PD2);
-	RX_EN();
 }
 
 
@@ -86,7 +87,7 @@ SIGNAL(SIG_UART_RECV)
 				
 				switch(pre)
 				{
-/*				
+				
 					case '$':
 						switch(uart[2])
 						{
@@ -118,7 +119,9 @@ SIGNAL(SIG_UART_RECV)
 					case '#':
 //						if(uart[2]==0) // це команда читання аналогових входів по типу І-7017
 //								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),0,1,2,3,4,5,6,7);
-								strcpy(uart,">00001111222233334444555566667777\r");
+								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),ai[0],dac[0],ai[2],dac[2],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+
+//								strcpy(uart,">00001111222233334444555566667777\r");
 								//ai[0],dac[0],ai[2],dac[2],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
 //						else // тут буде запис аналогових виходів по типу I-7024
 //						{
@@ -150,7 +153,7 @@ SIGNAL(SIG_UART_RECV)
 							uart[4]=0;
 						}
                     break;
- */
+
 					  
 					default:
 							uart[0]='?';
@@ -160,11 +163,13 @@ SIGNAL(SIG_UART_RECV)
 							uart[4]=0;
 					
 				} 
+				UCSRB=(_BV(RXCIE) | _BV(TXCIE) | _BV(TXEN) ); // 
 				TX_EN(); // enable driver
 				UDR=uart[0];
 				i=1;
 
 				break;
+
 			default:
 				uart[i]=s;
 				if(++i>34) i=0;
@@ -181,7 +186,11 @@ SIGNAL(SIG_UART_TRANS)
 		++i;
 	}
 	else
+	{
 		RX_EN(); 
+		UCSRB=(_BV(RXCIE) | _BV(TXCIE) | _BV(RXEN) ); // включити приймач.
+	}
+
 	return;
 }
 
