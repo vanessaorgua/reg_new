@@ -97,7 +97,12 @@ SIGNAL(SIG_UART_RECV)
 								break;
 
 							case 'A':
-								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),ai[0],dac[0],ai[2],dac[2],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+//								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),ai[0],dac[0],ai[2],dac[2],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),
+								ai[0],eeprom_read_byte(pn_en  )?ai[1]:dac[0],
+								ai[2],eeprom_read_byte(pn_en+1)?ai[3]:dac[1],
+								eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+
 								break;
 							
 							case '2': // Read configuration
@@ -119,7 +124,10 @@ SIGNAL(SIG_UART_RECV)
 						
 					case '#':
 						if(uart[2]=='\r') // це команда читання аналогових входів по типу І-7017
-								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),ai[0],dac[0],ai[2],dac[1],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),
+								ai[0],eeprom_read_byte(pn_en  )?ai[1]:dac[0],
+								ai[2],eeprom_read_byte(pn_en+1)?ai[3]:dac[1],
+								eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
 						else // тут буде запис аналогових виходів по типу I-7024
 						{
 						  // тут треба прочитати дані із порту та записати у виходи.
@@ -132,6 +140,7 @@ SIGNAL(SIG_UART_RECV)
 									+(int)(uart[4]-'0')*200
 									+(int)(uart[6]-'0')*20
 									+(int)(uart[7]-'0')*2;
+									+(int)(uart[8]-'0');
 								dac[s]=val;
 							}
 							uart[0]='>';

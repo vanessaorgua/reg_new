@@ -177,16 +177,30 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
   // спрощений алгоритм імені Нечипоренка
 #define DELTA 40
 
-  if(ai[1]>out[0]+DELTA)
-	sbi(PORTD,DW_1); // вклюсити стравлювання
-  else
-	cbi(PORTD,DW_1);
+  if(eeprom_read_byte(pn_en))
+  {
 
-  if(ai[1]<out[0]-DELTA)
-	sbi(PORTD,UP_1); // включити набір
-  else
-	cbi(PORTD,UP_1); //
+	if(ai[1]>out[0]+DELTA)
+	  sbi(PORTD,DW_1); // вклюсити стравлювання
+    else
+	  cbi(PORTD,DW_1);
+	
+    if(ai[1]<out[0]-DELTA)
+  	  sbi(PORTD,UP_1); // включити набір
+	else
+		cbi(PORTD,UP_1); //
+	}
+	else
+	{
+//	  ai[1]=dac[0]; // заворот назад на комп
+	  cbi(PORTD,DW_1);
+		cbi(PORTD,UP_1); //
+	
+	}
 
+
+  if(eeprom_read_byte(pn_en+1))
+  {
 
   if(ai[3]>out[1]+DELTA)
 	sbi(PORTD,DW_2); // вклюсити стравлювання
@@ -197,6 +211,13 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 	sbi(PORTD,UP_2); // включити набір
   else
 	cbi(PORTD,UP_2); //
+  }
+  else
+  {
+//	ai[3]=dac[1]; // заворот назад на комп
+	cbi(PORTD,DW_2);
+	cbi(PORTD,UP_2); //
+  }
 
 
 

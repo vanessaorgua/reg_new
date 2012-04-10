@@ -13,5 +13,7 @@ extern unsigned char EEMEM md[2];
 extern unsigned char EEMEM rev[2];
 
 extern char EEMEM spd;
+
+extern char EEMEM pn_en[2]; // пневматика відключена
 #endif
 

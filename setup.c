@@ -11,17 +11,21 @@
 #include "key.h"
 #include "eep.h"
 
+#define MAX_MENU 6
+
 /* Date: 27.06.2007   Time: 12:09:23 */
 /* Maximum length of a line: 6  byte */
 /* In total byte: 20                 */
 /* FileName: вK                      */
-prog_char menu[5][20]=
+prog_char menu[7][20]=
 {
 {66,120,111,227,184,0}, /* [0] "Входи"  */
 {66,184,120,111,227,184,0}, /* [1] "Виходи" */
-{65,227,112,101,99,97,0}, /* [2] "Адреса" */
-"Out select",
-"Valve type"
+"Out select", /*[2]*/
+"Valve type", /*[3]*/
+"Pnevmo output",/*[4]*/
+{65,227,112,101,99,97,0}, /* [5] "Адреса" */
+"Net speed", /*[6]*/
 };
 
 extern char s[34];
@@ -37,10 +41,13 @@ char readkey()
 
 void setup_adc_();
 void setup_dac_();
-void setup_addr();
 void setup_outsel();
 void setup_valve();
+void setup_pnevmo();
 
+
+void setup_addr();
+void setup_netspd();
 
 void calc();
 
@@ -60,7 +67,7 @@ void setup()
 				if(--i&0x80) i=4;
 				break;
 			case MAX:
-				if(++i>4) i=0;
+				if(++i>MAX_MENU) i=0;
 				break;
 				
 			case STOP:
@@ -75,14 +82,21 @@ void setup()
 						setup_dac_();
 						break;
 					case 2:
-						setup_addr();
-						break;
-					case 3:
 					  setup_outsel();
 					  break;
-					case 4:
+					case 3:
 					  setup_valve();
 					  break;
+					case 4:
+					  setup_pnevmo();
+					  break;
+					case 5:
+						setup_addr();
+						break;
+					case 6:
+						setup_netspd();
+						break;
+
 				}
 		}
 		
@@ -391,3 +405,69 @@ void setup_valve()
 	}
   }
 }
+
+
+prog_char pnen_msg[2][20]={"Pnevmo disble","Pnevmo enable"};
+
+void setup_pnen(char v )
+{
+  register char i=eeprom_read_byte(pn_en+v);
+
+  while(1)
+  {
+	put_lcd_P(pnen_msg+i,1);
+
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+			eeprom_write_byte(pn_en+v,i);
+	  case STOP:
+		return;
+	}
+
+  }
+
+}
+
+void setup_pnevmo()
+{
+  char i=0;
+  while(1)
+  {
+	put_lcd_P(menu[4],0);
+	sprintf_P(s,PSTR("Channel %d"),i+1);
+	put_lcd(s,1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		  put_lcd(s,0);
+		  setup_pnen(i);
+		  break;
+	  case STOP:
+		return;
+	}
+  }
+
+}
+
+
+
+void setup_netspd()
+{
+
+
+}
+
+

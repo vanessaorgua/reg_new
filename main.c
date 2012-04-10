@@ -35,6 +35,8 @@ int EEMEM val[2]={0,0};
 
 unsigned char EEMEM rev[2]={0,0};
 unsigned char EEMEM spd=0;
+
+unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
  
 //---------------------------------------------------------------------------------------------------------------------------
 // Дан?в в ОЗУ
@@ -186,10 +188,10 @@ int main()
 	{
 		 
 		
-		sprintf(s," %3d%% %3d%%\01%3d%%%c",ai[0]/40,ai[1]/40,dac[0]/40,eeprom_read_byte(md)?'A':'P');
+		sprintf(s," 1=%3d%% \01=%3d%%%c",ai[0]/40,dac[0]/40,eeprom_read_byte(md)?'A':'P');
 		put_lcd(s,0);
 
-		sprintf(s," %3d%% %3d%%\01%3d%%%c",ai[2]/40,ai[3]/40,dac[1]/40,eeprom_read_byte(md+1)?'A':'P');
+		sprintf(s," 2=%3d%% \01=%3d%%%c",ai[2]/40,dac[1]/40,eeprom_read_byte(md+1)?'A':'P');
 		put_lcd(s,1);
 
 		byte2lcd(128+64*ch,0);
