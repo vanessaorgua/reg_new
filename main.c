@@ -144,9 +144,16 @@ void calc()
 }
 
 //---------------------------------------------------------------------------------------------------------------------------
+
+#define UP_1 PD4
+#define DW_1 PD5
+#define UP_2 PD6
+#define DW_2 PD7
+
 int main()
 {
 	unsigned char ch=0;
+	register char pdo;
 	
 	wdt_enable(WDTO_500MS);
 	
@@ -187,11 +194,28 @@ int main()
 	while(1)
 	{
 		 
+		pdo=' ';
+		if(bit_is_set(PORTD,DW_1)) 
+		  pdo=4;
+		if(bit_is_set(PORTD,UP_1))
+		  pdo=3;
 		
-		sprintf(s," 1=%3d%% \01=%3d%%%c",ai[0]/40,dac[0]/40,eeprom_read_byte(md)?'A':'P');
+		sprintf(s," 1%3d%%  \01=%3d%%%c%c",ai[0]/40,
+		  (eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
+		  pdo,eeprom_read_byte(md)?'A':'P');
+
 		put_lcd(s,0);
 
-		sprintf(s," 2=%3d%% \01=%3d%%%c",ai[2]/40,dac[1]/40,eeprom_read_byte(md+1)?'A':'P');
+		pdo=' ';
+		if(bit_is_set(PORTD,DW_2)) 
+		  pdo=4;
+		if(bit_is_set(PORTD,UP_2))
+		  pdo=3;
+
+		sprintf(s," 2%3d%%  \01=%3d%%%c%c",ai[2]/40,
+			(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
+			pdo,eeprom_read_byte(md+1)?'A':'P');
+
 		put_lcd(s,1);
 
 		byte2lcd(128+64*ch,0);
