@@ -34,7 +34,7 @@ unsigned char EEMEM md[2]={0,0};
 int EEMEM val[2]={0,0};
 
 unsigned char EEMEM rev[2]={0,0};
-unsigned char EEMEM spd=0;
+unsigned char EEMEM spd=1; // початкова швидкість 19200
 
 unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
  

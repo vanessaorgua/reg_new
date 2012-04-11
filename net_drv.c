@@ -21,7 +21,7 @@ unsigned char i=0;
 
 prog_char name[]="!00REGA\r";
 
-prog_char sp[]={35	,23	,17	,11	,5	};
+prog_char sp[]={71,35	,17	,11	,5	};
 
 extern int ai[8];
 extern unsigned int dac[2]; // Сигнал токового виходу.
@@ -136,12 +136,12 @@ SIGNAL(SIG_UART_RECV)
 							s=uart[2]-'0'; //номер каналу
 							if(eeprom_read_byte(md+s))
 							{
-								val=(int)(uart[3]-'0')*2000
-									+(int)(uart[4]-'0')*200
-									+(int)(uart[6]-'0')*20
-									+(int)(uart[7]-'0')*2;
-									+(int)(uart[8]-'0');
-								dac[s]=val;
+								val=(int)(uart[3]-'0')*10000
+									+(int)(uart[4]-'0')*1000
+									+(int)(uart[6]-'0')*100
+									+(int)(uart[7]-'0')*10;
+									+(int)(uart[8]-'0')+1;
+								dac[s]=val/5;
 							}
 							uart[0]='>';
 							uart[1]=CR;

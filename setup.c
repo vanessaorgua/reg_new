@@ -34,6 +34,7 @@ char readkey()
 {
 	while(getkey()!=0xF0)
 		wdt_reset();
+	delay_ms(100);
 	while(getkey()==0xF0)
 		wdt_reset();
 	return getkey();
@@ -463,10 +464,32 @@ void setup_pnevmo()
 }
 
 
+prog_char speed[5][10]={"9600","19200","38400","56700","115200"};
 
 void setup_netspd()
 {
-
+  register char i=eeprom_read_byte(&spd);
+  put_lcd_P(menu[6],0);
+  while(1)
+  {
+	put_lcd_P(speed[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		if(--i&0x80) i=4;
+		break;
+	  case MAX:
+		if(++i>4) i=0;
+		break;
+	  case SET:
+		  eeprom_write_byte(&spd,i);
+		  put_lcd_P(PSTR("Restart!"),1);
+		  while(1); // перезапуск програми
+	  case STOP:
+		return;
+	}
+	
+  }
 
 }
 
