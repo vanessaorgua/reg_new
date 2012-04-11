@@ -136,7 +136,7 @@ void calc()
 				dac_o[j]=0;
 				break;
 			default: // 0-5
-				dac_k[j]=(((long)(eeprom_read_word(dac_hi+j)/5))<<BASE)/4000l;
+				dac_k[j]=(((long)(eeprom_read_word(dac_hi+j)/4))<<BASE)/4000l;
 				dac_o[j]=0;
 				
 		}

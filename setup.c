@@ -21,12 +21,15 @@ prog_char menu[7][20]=
 {
 {66,120,111,227,184,0}, /* [0] "Входи"  */
 {66,184,120,111,227,184,0}, /* [1] "Виходи" */
-"Out select", /*[2]*/
-"Valve type", /*[3]*/
-"Pnevmo output",/*[4]*/
+{0x42,0xB8,0x78,0x2E,0x20,0x63,0xBF,0x70,0x79,0xBC,0}, // "Out select" /*[2]*/
+{0x54,0xB8,0xBE,0x20,0xBA,0xBB,0x61,0xBE,0x61,0xBD,0x61,0}, // "Valve type", /*[3]*/
+{0x42,0xB8,0x78,'i',0xE3,0x20,0xBD,0x61,0x20,0xA8,0x45,0xA8,0x49,0}, // "Pnevmo output",/*[4]*/
 {65,227,112,101,99,97,0}, /* [5] "Адреса" */
-"Net speed", /*[6]*/
+{0xAC,0xA8,0xE0,0x20,0xBC,0x65,0x70,0x65,0xB6,0}, // "Net speed", /*[6]*/
 };
+
+
+prog_char chan_n[]={0x4B,0x61,0xBD,0x61,0xBB,0x20,0x25,0x64,0};
 
 extern char s[34];
 
@@ -302,7 +305,7 @@ void setup_addr()
   
 }
 
-prog_char mode[3][20]={"4-20mA","0-20mA","---"};
+prog_char mode[3][20]={"4-20mA","0-20mA","0-5mA"};
 
 void setup_out_modesel(char v)
 {
@@ -313,10 +316,10 @@ void setup_out_modesel(char v)
 	switch(readkey())
 	{
 	  case MIN:
-		i=0;
+		if(--i&0x80) i=2;
 		break;
 	  case MAX:
-		i=1;
+		if(++i>2) i=0;
 		break;
 	  case SET:
 		eeprom_write_byte(dac_m+v,i);
@@ -327,13 +330,14 @@ void setup_out_modesel(char v)
 
 }
 
+
 void setup_outsel()
 {
   char i=0;
   while(1)
   {
 	put_lcd_P(menu[3],0);
-	sprintf_P(s,PSTR("Channel %d"),i+1);
+	sprintf_P(s,chan_n,i+1);
 	put_lcd(s,1);
 	switch(readkey())
 	{
@@ -354,7 +358,10 @@ void setup_outsel()
   }
 }
 
-prog_char modevt[2][10]={"NO","NC"};
+prog_char modevt[2][18]={
+{0x4B,0xBB,0x61,0xBE,0x61,0xBD,0x20,0x48,0x4F,0x28,0x42,0x4F,0x29,0}, // "NO","NC"
+{0x4B,0xBB,0x61,0xBE,0x61,0xBD,0x20,0x48,0xA4,0x28,0x42,0xA4,0x29,0}
+};
 
 void setup_vt(char v)
 {
@@ -385,8 +392,8 @@ void setup_valve()
   char i=0;
   while(1)
   {
-	put_lcd_P(menu[4],0);
-	sprintf_P(s,PSTR("Channel %d"),i+1);
+	put_lcd_P(menu[3],0);
+	sprintf_P(s,chan_n,i+1);
 	put_lcd(s,1);
 	switch(readkey())
 	{
@@ -408,7 +415,10 @@ void setup_valve()
 }
 
 
-prog_char pnen_msg[2][20]={"Pnevmo disble","Pnevmo enable"};
+prog_char pnen_msg[2][20]={
+{0xA8,0x45,0xA8,0x49,0x20,0xB3,0xB8,0xBA,0xBB,0xC6,0xC0,0x65,0xBD,0x6F,0}, // "Pnevmo enable"
+{0xA8,0x45,0xA8,0x49,0x20,0xB3,0xBA,0xBB,0xC6,0xC0,0x65,0xBD,0x6F,0} // "Pnevmo disble"
+};
 
 void setup_pnen(char v )
 {
@@ -442,7 +452,7 @@ void setup_pnevmo()
   while(1)
   {
 	put_lcd_P(menu[4],0);
-	sprintf_P(s,PSTR("Channel %d"),i+1);
+	sprintf_P(s,chan_n,i+1);
 	put_lcd(s,1);
 	switch(readkey())
 	{
