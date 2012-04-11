@@ -65,7 +65,7 @@ void setup()
 		switch(readkey())
 		{
 			case MIN:
-				if(--i&0x80) i=4;
+				if(--i&0x80) i=MAX_MENU;
 				break;
 			case MAX:
 				if(++i>MAX_MENU) i=0;

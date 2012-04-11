@@ -24,7 +24,7 @@
 //---------------------------------------------------------------------------------------------------------------------------
 char EEMEM addr=1;
 
-int EEMEM sca_lo[8]= {56,890,1055,38,0,0,0,0};//{0,0,0,0,0,0,0,0};
+int EEMEM sca_lo[8]= {0,0,0,0,0,0,0,0};//{0,0,0,0,0,0,0,0};
 int EEMEM sca_hi[8]={4000,4000,4000,3338,4000,4000,4000,4000};
 
 unsigned int EEMEM dac_hi[2]={4000,4000};
@@ -154,6 +154,7 @@ int main()
 {
 	unsigned char ch=0;
 	register char pdo;
+	unsigned char nc=0;
 	
 	wdt_enable(WDTO_500MS);
 	
@@ -222,44 +223,64 @@ int main()
 		byte2lcd(2,1);
 		
 
+
 		switch(getkey())
 		{
 			case SET & STOP:
 				setup();
 				calc();
 				break;
+
 			case STOP:
 				ch ^=1;
+				wait_key_release();
 				break;
+
 			case SET:
 				if(eeprom_read_byte(md+ch))
 				{
 					eeprom_write_byte(md+ch,0);
-					dac[ch] = ((dac[ch]/200))*200;
+					// dac[ch] = ((dac[ch]/200))*200;
 				}
 				else
 					eeprom_write_byte(md+ch,1);
+
+				wait_key_release();
 				break;
 			case MIN:
+				if(++nc>6) nc=6;
+				
 				if(!eeprom_read_byte(md+ch))
 				{
-					dac[ch]-=200;
+					dac[ch]-=nc<6?40:200;
 					if(dac[ch]&0x8000) dac[ch]=0;
 					eeprom_write_word(val+ch,dac[ch]);
 				}
+
+				delay_ms(300);
+				wdt_reset();
 				break;
 			case MAX:
+				if(++nc>6) nc=6;
 				if(!eeprom_read_byte(md+ch))
 				{
-					dac[ch]+=200;
+					dac[ch]+=nc<6?40:200;
 					if(dac[ch]>4000) dac[ch]=4000;
 					eeprom_write_word(val+ch,dac[ch]);
 				}
-			
+
+				delay_ms(300);
+				wdt_reset();
+				
+				break;
+
+			default:
+				delay_ms(300);
+				wdt_reset();
+				nc=0;
+				break;
 		}
 
-		delay_ms(300);
-		wdt_reset();
 	}
 	
 	return 0;

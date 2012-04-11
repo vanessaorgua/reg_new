@@ -7,5 +7,8 @@
 #define MAX  0xE0
 #define getkey() (PINC&0xF0)
 
+#define wait_key_release() 	while(getkey()!=0xF0) wdt_reset();
+
+
 #endif
 
