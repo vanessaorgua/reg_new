@@ -336,7 +336,7 @@ void setup_outsel()
   char i=0;
   while(1)
   {
-	put_lcd_P(menu[3],0);
+	put_lcd_P(menu[2],0);
 	sprintf_P(s,chan_n,i+1);
 	put_lcd(s,1);
 	switch(readkey())
