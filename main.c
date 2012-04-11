@@ -156,6 +156,8 @@ int main()
 	register char pdo;
 	unsigned char nc=0;
 	
+	char buf_dac[17]; // буфер для виводу рядка із завданням
+	
 	wdt_enable(WDTO_500MS);
 	
 	PORTB=0x1C;
@@ -194,18 +196,27 @@ int main()
 
 	while(1)
 	{
-		 
+		
+		sprintf_P(buf_dac,PSTR(" Setpoint %3d%%"),dac[ch]/40); // підготувати буфер до виводу
+		
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_1)) 
 		  pdo=4;
 		if(bit_is_set(PORTD,UP_1))
 		  pdo=3;
 		
-		sprintf(s," 1%3d%%  \01=%3d%%%c%c",ai[0]/40,
-		  (eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
-		  pdo,eeprom_read_byte(md)?'A':'P');
+		if(ch==0 || nc==0)
+		{
+		  sprintf(s," 1%3d%%  \01=%3d%%%c%c",ai[0]/40,
+			(eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
+			pdo,eeprom_read_byte(md)?'A':'P');
 
-		put_lcd(s,0);
+			put_lcd(s,0);
+		}
+		else
+		{
+		  put_lcd(buf_dac,0);
+		}
 
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_2)) 
@@ -213,11 +224,18 @@ int main()
 		if(bit_is_set(PORTD,UP_2))
 		  pdo=3;
 
-		sprintf(s," 2%3d%%  \01=%3d%%%c%c",ai[2]/40,
-			(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
-			pdo,eeprom_read_byte(md+1)?'A':'P');
+		if(ch==1 || nc==0)
+		{
+			sprintf(s," 2%3d%%  \01=%3d%%%c%c",ai[2]/40,
+				(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
+				pdo,eeprom_read_byte(md+1)?'A':'P');
 
-		put_lcd(s,1);
+			put_lcd(s,1);
+		}
+		else
+		{
+			put_lcd(buf_dac,1);
+		}
 
 		byte2lcd(128+64*ch,0);
 		byte2lcd(2,1);
@@ -277,7 +295,10 @@ int main()
 			default:
 				delay_ms(300);
 				wdt_reset();
-				nc=0;
+
+				if(nc>1) nc=1;
+				if(--nc&&0x80) nc=0;
+
 				break;
 		}
 
