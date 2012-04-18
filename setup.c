@@ -173,7 +173,7 @@ void calibr_adc(unsigned char i)
 		sprintf_P(s,msg1,i+1,(int)sum);
 		put_lcd(s,0);
 		
-		sprintf_P(s,PSTR("lo=%4d hi=%4d"),lo,hi);
+		sprintf_P(s,PSTR(" \05=%4d \06=%4d"),lo,hi);
 		put_lcd(s,1);
 		
 		switch(getkey())
@@ -248,6 +248,7 @@ extern union {
 
 extern unsigned char c_d;
 
+prog_char dacout[]={0x4D,0x61,0x63,0xBA,0x20,0xE1,0x41,0xA8,0x3D,0x25,0x34,0};
 void calibr_dac(unsigned char i)
 {
 	c_d=0;
@@ -255,7 +256,7 @@ void calibr_dac(unsigned char i)
 	ao.i[i]=eeprom_read_word(dac_hi+i);
 	while(1)
 	{
-		sprintf_P(s,PSTR("max: %4d"),ao.i[i]);
+		sprintf_P(s,dacout,ao.i[i]);
 		put_lcd(s,1);
 
 		switch(getkey())
@@ -280,12 +281,13 @@ void calibr_dac(unsigned char i)
 }
 
 
+prog_char setaddr[]={0x41,0xE3,0x70,0x65,0x63,0x61,0x20,0x25,0x32,0};
 void setup_addr()
 {
   char i=eeprom_read_byte(&addr);
   while(1)
   {
-	sprintf_P(s,PSTR("Address %2d"),i);
+	sprintf_P(s,setaddr,i); // "Address %2d"
 	put_lcd(s,1);
 	switch(readkey())
 	{
@@ -474,7 +476,7 @@ void setup_pnevmo()
 }
 
 
-prog_char speed[5][10]={"9600","19200","38400","56700","115200"};
+prog_char speed[5][10]={"9600","19200","38400","57600","115200"};
 
 void setup_netspd()
 {

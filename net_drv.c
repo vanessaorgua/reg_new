@@ -80,9 +80,9 @@ SIGNAL(SIG_UART_RECV)
 				uart[i]=CR;
 				uart[i+1]=0;
 				if(pre==0) break;
-//				eeprom_busy_wait();
-//				s=eeprom_read_byte(&addr);
-				s=1;
+				eeprom_busy_wait();
+				s=eeprom_read_byte(&addr);
+//				s=1;
 				if(htoc(uart[0],uart[1])!=s ) // addres check
 					break;
 				

@@ -91,6 +91,9 @@ void setcg(unsigned char a,const char *sym)
     prog_char tg[]={0x00,0x1C,0x09,0x0A,0x04,0x0B,0x12,0x02};
     prog_char mg[]={0x18,0x08,0x11,0x0A,0x14,0x0b,0x12,0x02};
 	prog_char grad[]={2	,5	,2	,0	,0	,0	,0	,0	};
+	prog_char sim_hi[]={0x1F,0x4,0xE,0x15,0x4,0x4,0x4,0x4};
+	prog_char sim_lo[]={0x4,0x4,0x4,0x4,0x15,0xE,0x4,0x1F};
+
 
 void lcd_init()
 {
@@ -99,13 +102,17 @@ void lcd_init()
 	init_LCD();
 	delay_ms(10);
 	
-	setcg(2,arrov);
 	setcg(1,valve);
+	setcg(2,arrov);
 	setcg(3,up);
 	setcg(4,dw);
-	setcg(5,tg);
-	setcg(6,mg);
-	setcg(7,grad);
+	setcg(5,sim_lo);
+	setcg(6,sim_hi);
+
+	setcg(7,tg);
+	setcg(8,mg);
+	setcg(9,grad);
+
 
 }
 
@@ -149,6 +156,8 @@ void calc()
 #define DW_1 PD5
 #define UP_2 PD6
 #define DW_2 PD7
+
+prog_char setpt[]={0x20,0xA4,0x61,0xB3,0xE3,0x61,0xBD,0xBD,0xC7,0x20,0x25,0x33,0x64,0x25,0x25,0};
 
 int main()
 {
@@ -197,7 +206,7 @@ int main()
 	while(1)
 	{
 		
-		sprintf_P(buf_dac,PSTR(" Setpoint %3d%%"),dac[ch]/40); // підготувати буфер до виводу
+		sprintf_P(buf_dac,setpt,dac[ch]/40); // підготувати буфер до виводу
 		
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_1)) 
@@ -207,7 +216,7 @@ int main()
 		
 		if(ch==0 || nc==0)
 		{
-		  sprintf(s," 1%3d%%  \01=%3d%%%c%c",ai[0]/40,
+		  sprintf(s,"  %3d%%  \01=%3d%%%c%c",ai[0]/40,
 			(eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
 			pdo,eeprom_read_byte(md)?'A':'P');
 
@@ -226,7 +235,7 @@ int main()
 
 		if(ch==1 || nc==0)
 		{
-			sprintf(s," 2%3d%%  \01=%3d%%%c%c",ai[2]/40,
+			sprintf(s,"  %3d%%  \01=%3d%%%c%c",ai[2]/40,
 				(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
 				pdo,eeprom_read_byte(md+1)?'A':'P');
 
@@ -244,7 +253,7 @@ int main()
 
 		switch(getkey())
 		{
-			case SET & STOP:
+			case MIN & MAX:
 				setup();
 				calc();
 				break;
