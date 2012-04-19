@@ -9,8 +9,8 @@
 #define sbi(X,Y) X |=  _BV(Y)
 #define cbi(X,Y) X &= ~_BV(Y)
 
-#define TX_EN() 		sbi(PORTA,PA1); cbi(PORTC,PC3);
-#define RX_EN()		    sbi(PORTC,PC3); cbi(PORTA,PA1);
+#define TX_EN() 		sbi(PORTA,PA1); sbi(PORTC,PC3);
+#define RX_EN()		    cbi(PORTC,PC3); cbi(PORTA,PA1);
 
 
 unsigned char uart[35]; // uart buffer
