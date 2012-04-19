@@ -24,7 +24,7 @@ prog_char name[]="!00REGA\r";
 prog_char sp[]={71,35	,17	,11	,5	};
 
 extern int ai[8];
-extern unsigned int dac[2]; // Сигнал токового виходу.
+extern unsigned int dac[8]; // Сигнал токового виходу.
 
 
 void net_init()
@@ -45,6 +45,27 @@ static __inline__ unsigned char htoc(unsigned char hi,unsigned char lo)
 {
 	return ((hi-(hi<'A'?'0':'7')) << 4) + (lo-(lo<'A'?'0':'7'));
 }
+
+
+void pack_ana(char* out, int v) // це буде функція спакування даних у вихідний буфер
+{
+  register char i;
+
+  i= v>>12;
+  out[0]=i&0x0F;
+
+  i=v>>8;
+  out[1]=i&0x0F;
+
+  i=v>>4;
+  out[2]=i&0x0F;
+
+  out[3]=v&0x0F;
+  
+  for(i=0;i<4;++i)
+	out[i] += out[i]<10?'0':'A'-10; 
+}
+
 
 
 SIGNAL(SIG_UART_RECV)
@@ -93,24 +114,54 @@ SIGNAL(SIG_UART_RECV)
 						switch(uart[2])
 						{
 							case 'M':
-								strcpy_P(uart,name);
+								strcpy_P(uart,name); // чи це взагалі потрібно? 
 								break;
 
 							case 'A':
 //								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),ai[0],dac[0],ai[2],dac[2],eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
-								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),
-								ai[0],eeprom_read_byte(pn_en  )?ai[1]:dac[0],
-								ai[2],eeprom_read_byte(pn_en+1)?ai[3]:dac[1],
-								eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+								//sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),
+								uart[0]='>';
+
+								pack_ana(uart+1,ai[0]);
+								pack_ana(uart+5,eeprom_read_byte(pn_en  )?ai[1]:dac[0]);
+								pack_ana(uart+9,ai[2]);
+								pack_ana(uart+13,eeprom_read_byte(pn_en+1)?ai[3]:dac[1]);
+								pack_ana(uart+17,eeprom_read_byte(md));
+								pack_ana(uart+21,eeprom_read_byte(md+1));
+								pack_ana(uart+25,ai[1]);
+								pack_ana(uart+29,ai[3]);
+
+								uart[33]=CR;
+								uart[34]=0;
 
 								break;
 							
 							case '2': // Read configuration
-							  sprintf_P(uart,PSTR("!%0X300700\r"),s);
+							  //sprintf_P(uart,PSTR("!%0X300700\r"),s);
+							  uart[2]=uart[1]; // посунути адресу.
+							  uart[1]=uart[0]; 
+							  uart[0]='!';
+
+							  uart[3]='3';
+							  uart[4]='0';
+							  uart[5]='0';
+							  uart[6]='7';
+							  uart[7]='0';
+							  uart[8]='0';
+							  uart[9]=CR;
+							  uart[10]=0;
 							  break;
 
 							case '9':
-							  sprintf_P(uart,PSTR("!%02X00\r"),s);
+							  // sprintf_P(uart,PSTR("!%02X00\r"),s);
+							  uart[2]=uart[1]; // посунути адресу
+							  uart[1]=uart[0]; 
+							  uart[0]='!';
+
+							  uart[3]='0';
+							  uart[4]='0';
+							  uart[5]=CR;
+							  uart[6]=0;
 							  break;
 							
 							default:
@@ -124,10 +175,22 @@ SIGNAL(SIG_UART_RECV)
 						
 					case '#':
 						if(uart[2]=='\r') // це команда читання аналогових входів по типу І-7017
-								sprintf_P(uart,PSTR(">%04X%04X%04X%04X%04X%04X%04X%04X\r"),
-								ai[0],eeprom_read_byte(pn_en  )?ai[1]:dac[0],
-								ai[2],eeprom_read_byte(pn_en+1)?ai[3]:dac[1],
-								eeprom_read_byte(md),eeprom_read_byte(md+1),ai[1],ai[3]);
+						{
+							// скопіювати сюди код із команди $AAА
+								uart[0]='>';
+
+								pack_ana(uart+1,ai[0]);
+								pack_ana(uart+5,eeprom_read_byte(pn_en  )?ai[1]:dac[0]);
+								pack_ana(uart+9,ai[2]);
+								pack_ana(uart+13,eeprom_read_byte(pn_en+1)?ai[3]:dac[1]);
+								pack_ana(uart+17,eeprom_read_byte(md));
+								pack_ana(uart+21,eeprom_read_byte(md+1));
+								pack_ana(uart+25,ai[1]);
+								pack_ana(uart+29,ai[3]);
+
+								uart[33]=CR;
+								uart[34]=0;
+						}
 						else // тут буде запис аналогових виходів по типу I-7024
 						{
 						  // тут треба прочитати дані із порту та записати у виходи.
