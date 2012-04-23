@@ -15,5 +15,8 @@ extern unsigned char EEMEM rev[2];
 extern char EEMEM spd;
 
 extern char EEMEM pn_en[2]; // пневматика відключена
+
+extern unsigned int EEMEM ensca[2][2]; // тут буде зберігатися інженерна шкала
+
 #endif
 

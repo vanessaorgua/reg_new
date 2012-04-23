@@ -1,7 +1,8 @@
 
 MCU=atmega32
 
-CSRC=main.c lcd.c delay.c setup.c work.c net_drv.c
+CSRC=main.c lcd.c delay.c setup.c work.c net_drv.c scale_setup.c
+
 # spi.c
 TARGET = reg_new
 

@@ -37,6 +37,13 @@ unsigned char EEMEM rev[2]={0,0};
 unsigned char EEMEM spd=1; // початкова швидкість 19200
 
 unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
+
+unsigned int EEMEM ensca[2][2]={ // тут буде зберігатися інженерна шкала
+{0,0},
+{100,100}
+};
+
+
  
 //---------------------------------------------------------------------------------------------------------------------------
 // Дан?в в ОЗУ
@@ -64,10 +71,11 @@ sca_k[8];
 #endif
 
 dac_k[2];
+
 int dac_o[2];
 
-
 char s[34]; // буфер LCD
+
 
 //---------------------------------------------------------------------------------------------------------------------------
 void net_init();
@@ -86,14 +94,14 @@ void setcg(unsigned char a,const char *sym)
 
 	prog_char valve[]={0x0E,0x0E,0x04,0x15,0x1B,0x1F,0x1B,0x11};
 	prog_char arrov[]={0,8,4,30,4,8,0,0};
-    prog_char up[]={0,4	,14	,21	,4	,4	,4	,0	};
-    prog_char dw[]={0	,4	,4	,4	,21	,14	,4,0	};
+//    prog_char up[]={0,4	,14	,21	,4	,4	,4	,0	};
+//    prog_char dw[]={0	,4	,4	,4	,21	,14	,4,0	};
     prog_char tg[]={0x00,0x1C,0x09,0x0A,0x04,0x0B,0x12,0x02};
     prog_char mg[]={0x18,0x08,0x11,0x0A,0x14,0x0b,0x12,0x02};
 	prog_char grad[]={2	,5	,2	,0	,0	,0	,0	,0	};
 
-//	prog_char sim_hi[]={0x1F,0x4,0xE,0x15,0x4,0x4,0x4,0x4};
-//	prog_char sim_lo[]={0x4,0x4,0x4,0x4,0x15,0xE,0x4,0x1F};
+	prog_char sim_hi[]={0x1F,0x4,0xE,0x15,0x4,0x4,0x4,0x4};
+	prog_char sim_lo[]={0x4,0x4,0x4,0x4,0x15,0xE,0x4,0x1F};
 
 
 void lcd_init()
@@ -105,13 +113,15 @@ void lcd_init()
 	
 	setcg(1,valve);
 	setcg(2,arrov);
-	setcg(3,up);
-	setcg(4,dw);
+
+//	setcg(3,up);
+//	setcg(4,dw);
+	setcg(3,sim_lo);
+	setcg(4,sim_hi);
+
 	setcg(5,tg);
 	setcg(6,mg);
 	setcg(7,grad);
-//	setcg(5,sim_lo);
-//	setcg(6,sim_hi);
 }
 
 
@@ -208,9 +218,9 @@ int main()
 		
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_1)) 
-		  pdo=4;
+		  pdo=0xda;
 		if(bit_is_set(PORTD,UP_1))
-		  pdo=3;
+		  pdo=0xd9;
 		
 		if(ch==0 || nc==0)
 		{
@@ -227,9 +237,9 @@ int main()
 
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_2)) 
-		  pdo=4;
+		  pdo=0xda;
 		if(bit_is_set(PORTD,UP_2))
-		  pdo=3;
+		  pdo=0xd9;
 
 		if(ch==1 || nc==0)
 		{

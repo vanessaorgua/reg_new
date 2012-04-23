@@ -19,6 +19,7 @@
 /* FileName: вK                      */
 prog_char menu[7][20]=
 {
+
 {66,120,111,227,184,0}, /* [0] "Входи"  */
 {66,184,120,111,227,184,0}, /* [1] "Виходи" */
 {0x42,0xB8,0x78,0x2E,0x20,0x63,0xBF,0x70,0x79,0xBC,0}, // "Out select" /*[2]*/
@@ -153,11 +154,6 @@ prog_char msg1[]={75,97,189,97,187,32,37,100,32,37,52,100,0}; /* [0] "Канал
 
 extern unsigned int f[8][16];
 
-extern    prog_char mg[] ; //={0x18,0x08,0x11,0x0A,0x14,0x0b,0x12,0x02};
-extern 	prog_char grad[] ; // ={2	,5	,2	,0	,0	,0	,0	,0	};
-prog_char sim_hi[]={0x1F,0x4,0xE,0x15,0x4,0x4,0x4,0x4};
-prog_char sim_lo[]={0x4,0x4,0x4,0x4,0x15,0xE,0x4,0x1F};
-
 
 void calibr_adc(unsigned char i)
 {
@@ -170,8 +166,6 @@ void calibr_adc(unsigned char i)
 	lo=eeprom_read_word(sca_lo+i);
 
 	// перегрузити таблицю символів
-	setcg(6,sim_lo);
-	setcg(7,sim_hi);
 
 	while(1)
 	{
@@ -183,7 +177,7 @@ void calibr_adc(unsigned char i)
 		sprintf_P(s,msg1,i+1,(int)sum);
 		put_lcd(s,0);
 		
-		sprintf_P(s,PSTR(" \06=%4d \07=%4d"),lo,hi);
+		sprintf_P(s,PSTR(" \03=%4d \04=%4d"),lo,hi);
 		put_lcd(s,1);
 		
 		switch(getkey())
@@ -198,9 +192,6 @@ void calibr_adc(unsigned char i)
 				eeprom_write_word(sca_hi+i,hi);
 				eeprom_write_word(sca_lo+i,lo);
 			case STOP:
-				// вернути назад таблицю символів
-				setcg(6,mg);
-				setcg(7,grad);
 
 				return;
 				
