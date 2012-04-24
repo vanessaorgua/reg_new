@@ -39,7 +39,7 @@ unsigned char EEMEM spd=1; // початкова швидкість 19200
 unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
 
 
-unsigned char EEMEM adc[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів
+unsigned char EEMEM adc_[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів
 
 unsigned int EEMEM ensca[2][2]={ // тут буде зберігатися інженерна шкала
 {0,0},
