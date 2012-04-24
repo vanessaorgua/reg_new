@@ -111,6 +111,16 @@ void setcg(unsigned char a,const char *sym)
 	prog_char sim_lo[]={0x4,0x4,0x4,0x4,0x15,0xE,0x4,0x1F};
 
 
+// таблиця одиниць
+prog_char unit[5][2]={
+{'%',' '},
+{7,'C'},
+{'p','H'},
+{0xBC,6},
+{5,' '}
+};
+
+
 void lcd_init()
 {
 // знакогенератор розм_щується в EEPROM
