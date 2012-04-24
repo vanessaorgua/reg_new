@@ -21,8 +21,7 @@
 #define CHANNEL_ALL 0x0
 
 
-//prog_char adc[8]={0x08,0x10,0x18,0x20,0x28,0x30,0x38,0x02};
-  prog_char adc[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02};
+//  prog_char adc[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02};
 
 extern int ai[8]; // Шкальован? до 0...4000 аналогов? входи.
 
@@ -83,7 +82,7 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 		for(i=0;i<7;++i)
 		{
 			cbi(PORTB,CSA);
-			pack.c[1]=SPI_send(pgm_read_byte(adc+i));
+			pack.c[1]=SPI_send(eeprom_read_byte(adc+i));
 			pack.c[0]=SPI_send(0);
 			sbi(PORTB,CSA);
 			f[i][p]=pack.i;

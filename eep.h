@@ -16,7 +16,17 @@ extern char EEMEM spd;
 
 extern char EEMEM pn_en[2]; // пневматика відключена
 
-extern unsigned int EEMEM ensca[2][2]; // тут буде зберігатися інженерна шкала
+
+extern unsigned char EEMEM adc[8] ; // ={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів
+
+extern unsigned int EEMEM ensca[2][2] ; //={ // тут буде зберігатися інженерна шкала
+//{0,100},
+// {0,100}
+// };
+
+extern unsigned char EEMEM enprz[2] ; //={0,0}; // кількість знаків після коми
+extern unsigned char EEMEM enunit[2] ; //={0,0}; // вибір одиниць
+
 
 #endif
 
