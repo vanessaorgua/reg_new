@@ -93,9 +93,35 @@ void setup_channel(char v)
 }
 
 extern prog_char unit[5][2];
+prog_char menu10[]={0x4f, 0xe3, 0xb8, 0xbd, 0xb8, 0xe5, 0x69, 0x3a, 0x20, 0x25, 0x63, 0x25, 0x63, 0x0}; // [0] "Одиниці: %c%c"
+#define MAX_UNIT 4
 
 void setup_unit(char v)
 {
+  register char i;
+  i=eeprom_read_byte(enunit+v);
+  
+  wait_key_release();
+  while(1)
+  {
+	sprintf_P(s,menu10,pgm_read_byte(unit[i]),pgm_read_byte(unit[i]+1));
+	put_lcd(s,1);
+		switch(readkey())
+		{
+			case MIN:
+				if(--i&0x80) i=MAX_UNIT;
+				break;
+			case MAX:
+				if(++i>MAX_UNIT) i=0;
+				break;
+				
+			case SET:
+				eeprom_write_byte(enunit+v,i);
+			case STOP:
+				return;
+			}
+  }
+  
 
 }
 
