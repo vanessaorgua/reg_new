@@ -11,6 +11,8 @@
 #include "key.h"
 #include "eep.h"
 
+extern char s[34];
+
 void setup_address();
 void setup_speed();
 
@@ -66,13 +68,62 @@ void setup_system()
 }
 
 
+
+prog_char setaddr[]={0x41,0xE3,0x70,0x65,0x63,0x61,0x20,0x25,0x64,0};
+
 void setup_address()
 {
+  char i=eeprom_read_byte(&addr);
+  while(1)
+  {
+	sprintf_P(s,setaddr,i); // "Address %2d"
+	put_lcd(s,1);
+	switch(readkey())
+	{
+	  case MIN:
+		if(--i<1) i=1;
+		break;
+	  case MAX:
+		if(++i>100) i=100;
+		break;
+	  case SET:
+		eeprom_write_byte(&addr,i);
+	  case STOP:
+		return;
 
+	}
+  }
+  
 }
+
+
+prog_char speed[5][10]={"9600","19200","38400","57600","115200"};
 
 void setup_speed()
 {
+
+  register char i=eeprom_read_byte(&spd);
+  // put_lcd_P(menu[6],0);
+  while(1)
+  {
+	put_lcd_P(speed[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		if(--i&0x80) i=4;
+		break;
+	  case MAX:
+		if(++i>4) i=0;
+		break;
+	  case SET:
+		  eeprom_write_byte(&spd,i);
+		  put_lcd_P(PSTR("Restart!"),1);
+		  while(1); // перезапуск програми
+	  case STOP:
+		return;
+	}
+	
+  }
 
 
 }
