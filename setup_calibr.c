@@ -22,6 +22,7 @@ prog_char menu7[2][16]={
 #define MAX_MENU 9
 
 void calibr_adc(char i);
+void calibr_dac(unsigned char i);
 
 
 void setup_calibr()
@@ -59,6 +60,8 @@ void setup_calibr()
 						break;
 					case 8:
 					case 9:
+						put_lcd(s,0);
+						calibr_dac(i-8);
 						break;
 				}
 		}
@@ -122,3 +125,43 @@ void calibr_adc(char i)
 
 }
 
+extern union {
+	unsigned int i[2];
+	unsigned char c[4];
+} ao;
+
+extern unsigned char c_d;
+
+prog_char dacout[]={0x4D,0x61,0xBA,0x63,0x20,0xE1,0x41,0xA8,0x3D,0x25,0x34,0x64,0};
+void calibr_dac(unsigned char i)
+{
+	c_d=0;
+
+	ao.i[i]=eeprom_read_word(dac_hi+i);
+	wait_key_release();
+	
+	while(1)
+	{
+		sprintf_P(s,dacout,ao.i[i]);
+		put_lcd(s,1);
+
+		switch(getkey())
+		{
+			case MIN:
+				if(--ao.i[i]<3900) ao.i[i]=3900;
+				break;
+			case MAX:
+				if(++ao.i[i]>4095) ao.i[i]=4095;
+				break;
+				
+			case SET:
+				eeprom_write_word(dac_hi+i,ao.i[i]);
+			case STOP:
+				c_d=1;
+				return;
+		}
+		delay_ms(100);
+		wdt_reset();
+	}	
+
+}
