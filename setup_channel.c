@@ -125,10 +125,36 @@ void setup_unit(char v)
 
 }
 
+prog_char menu11[4][6]={"xxx","xx.x","xx.xx"};
+#define MAX_PRZ 2
+
 void setup_prez(char v)
 {
+  register char i;
+  i=eeprom_read_byte(enprz+v);
+  
+  wait_key_release();
+  while(1)
+  {
+		put_lcd_P(menu11[i],1);
+		switch(readkey())
+		{
+			case MIN:
+				if(--i&0x80) i=MAX_PRZ;
+				break;
+			case MAX:
+				if(++i>MAX_PRZ) i=0;
+				break;
+				
+			case SET:
+				eeprom_write_byte(enprz+v,i);
+			case STOP:
+				return;
+			}
+  }
 
 }
+
 
 void setup_scale(char v)
 {
