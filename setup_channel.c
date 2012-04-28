@@ -161,14 +161,57 @@ void setup_scale(char v)
 
 }
 
+prog_char modevt[2][18]={
+{0x4B,0xBB,0x61,0xBE,0x61,0xBD,0x20,0x48,0x4F,0x28,0x42,0x4F,0x29,0}, // "NO","NC"
+{0x4B,0xBB,0x61,0xBE,0x61,0xBD,0x20,0x48,0xA4,0x28,0x42,0xA4,0x29,0}
+};
+
 void setup_valve(char v)
 {
 
+  char i=eeprom_read_byte(rev+v);
+  while(1)
+  {
+	put_lcd_P(modevt[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+		eeprom_write_byte(rev+v,i);
+	  case STOP:
+		return ;
+	}
 }
+
+}
+
+prog_char mode[3][20]={"4-20mA","0-20mA","0-5mA"};
 
 void setup_output(char v)
 {
-
+  char i=eeprom_read_byte(dac_m+v);
+  while(1)
+  {
+	put_lcd_P(mode[i],1);
+	switch(readkey())
+	{
+	  case MIN:
+		if(--i&0x80) i=2;
+		break;
+	  case MAX:
+		if(++i>2) i=0;
+		break;
+	  case SET:
+		eeprom_write_byte(dac_m+v,i);
+	  case STOP:
+		return ;
+	}
+  }
 }
 
 
