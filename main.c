@@ -42,7 +42,7 @@ unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
 unsigned char EEMEM adc_[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів
 
 unsigned int EEMEM ensca[2][2]={ // тут буде зберігатися інженерна шкала
-{0,12345},
+{0,100},
 {0,100}
 };
 
@@ -191,6 +191,10 @@ int main()
 	unsigned char nc=0;
 	
 	char buf_dac[17]; // буфер для виводу рядка із завданням
+
+	int hi,lo; // копії шкал
+	register long ct; // тимчасова змінна для розрахунків.
+
 	
 	wdt_enable(WDTO_500MS);
 	
@@ -232,7 +236,17 @@ int main()
 	{
 		
 		sprintf_P(buf_dac,setpt,dac[ch]/40); // підготувати буфер до виводу
-		
+
+// ---------------------------------------------------------------------------	
+// Вивід першого каналу
+	  lo=eeprom_read_word(ensca[0]);
+	  hi=eeprom_read_word(ensca[0]+1);
+	  ct=hi-lo;
+	  ct*=ai[0];
+	  ct/=4000;
+	  lo+=ct;
+	  hi=eeprom_read_byte(enunit);
+
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_1)) 
 		  pdo=0xda;
@@ -241,7 +255,7 @@ int main()
 		
 		if(ch==0 || nc==0)
 		{
-		  sprintf(s,"  %3d%%  \01=%3d%%%c%c",ai[0]/40,
+		  sprintf(s," %3d%c%c   \01%3d%%%c%c",lo, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
 			(eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
 			pdo,eeprom_read_byte(md)?'A':'P');
 
@@ -251,6 +265,15 @@ int main()
 		{
 		  put_lcd(buf_dac,0);
 		}
+// ------------------------------------------------------------------------------
+// вивід другого каналу
+	  lo=eeprom_read_word(ensca[1]);
+	  hi=eeprom_read_word(ensca[1]+1);
+	  ct=hi-lo;
+	  ct*=ai[2];
+	  ct/=4000;
+	  lo+=ct;
+	  hi=eeprom_read_byte(enunit+1);
 
 		pdo=' ';
 		if(bit_is_set(PORTD,DW_2)) 
@@ -260,7 +283,7 @@ int main()
 
 		if(ch==1 || nc==0)
 		{
-			sprintf(s,"  %3d%%  \01=%3d%%%c%c",ai[2]/40,
+		  sprintf(s," %3d%c%c   \01%3d%%%c%c",lo, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
 				(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
 				pdo,eeprom_read_byte(md+1)?'A':'P');
 
@@ -270,7 +293,7 @@ int main()
 		{
 			put_lcd(buf_dac,1);
 		}
-
+// --------------------------------------------------------------------------------
 		byte2lcd(128+64*ch,0);
 		byte2lcd(2,1);
 		
