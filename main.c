@@ -190,7 +190,7 @@ int main()
 	register char pdo;
 	unsigned char nc=0;
 	
-	char buf_dac[17]; // буфер для виводу рядка із завданням
+	char buf_dac[17],buf_val[10]; // буфер для виводу рядка із завданням
 
 	int hi,lo; // копії шкал
 	register long ct; // тимчасова змінна для розрахунків.
@@ -255,7 +255,22 @@ int main()
 		
 		if(ch==0 || nc==0)
 		{
-		  sprintf(s," %3d%c%c   \01%3d%%%c%c",lo, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
+		  switch(eeprom_read_byte(enprz))
+		  {
+		  	  default:
+		  	  case 0:
+		  		sprintf_P(buf_val,PSTR(" %4d"),lo);
+		  		break;
+		  	  case 1:
+		  		sprintf_P(buf_val,PSTR("%3d.%1d"),lo/10,lo%10);
+		  		break;
+		  	  case 2:
+		  		sprintf_P(buf_val,PSTR("%2d.%02d"),lo/100,lo%100);
+		  		break;
+		  	  
+		  }
+		  
+		  sprintf(s," %s%c%c \01%3d%%%c%c",buf_val, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
 			(eeprom_read_byte(pn_en)?ai[1]:dac[0])/40,
 			pdo,eeprom_read_byte(md)?'A':'P');
 
@@ -283,7 +298,22 @@ int main()
 
 		if(ch==1 || nc==0)
 		{
-		  sprintf(s," %3d%c%c   \01%3d%%%c%c",lo, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
+		  switch(eeprom_read_byte(enprz+1))
+		  {
+		  	  default:
+		  	  case 0:
+		  		sprintf_P(buf_val,PSTR(" %4d"),lo);
+		  		break;
+		  	  case 1:
+		  		sprintf_P(buf_val,PSTR("%3d.%1d"),lo/10,lo%10);
+		  		break;
+		  	  case 2:
+		  		sprintf_P(buf_val,PSTR("%2d.%02d"),lo/100,lo%100);
+		  		break;
+		  	  
+		  }
+		  
+		  sprintf(s," %s%c%c \01%3d%%%c%c",buf_val, pgm_read_byte(unit[hi]),pgm_read_byte(unit[hi]+1),
 				(eeprom_read_byte(pn_en+1)?ai[3]:dac[1])/40,
 				pdo,eeprom_read_byte(md+1)?'A':'P');
 
