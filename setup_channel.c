@@ -163,6 +163,8 @@ prog_char menu12[2][6]={
 {0x4d, 0x61, 0xba, 0x63, 0x0} // [1] "Макс"
 };
 
+
+prog_char menu13[]={0xac, 0xba, 0x61, 0xbb, 0x61, 0x20, 0xba, 0x61, 0xbd, 0x61, 0xbb, 0x20, 0x25, 0x64, 0x0}; // [0] "Шкала канал %d"
 void setup_scale(char v)
 {
   char p;
@@ -171,9 +173,15 @@ void setup_scale(char v)
   hi=eeprom_read_word(ensca[v]+1);
   p=eeprom_read_byte(enprz+v);
   wait_key_release();
+
+  sprintf_P(s+17,menu13,v+1);
   
   while(1)
   {
+  
+	sprintf_P(s,menu3,v+1);
+	put_lcd(s,0);
+	
 	switch(p)
 	{
 		default: // це якщо із єпрома прочитано якісь фігню тоді
@@ -192,10 +200,12 @@ void setup_scale(char v)
 		switch(readkey())
 		{
 			case MIN:
+				put_lcd(s+17,0);
 				put_lcd_P(menu12[0],1);
 				lo=input_value(lo,p,5);
 				break;
 			case MAX:
+				put_lcd(s+17,0);
 				 put_lcd_P(menu12[1],1);
 				hi=input_value(hi,p,5);
 				break;

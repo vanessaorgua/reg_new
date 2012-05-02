@@ -11,7 +11,7 @@ int input_value(int v,int decdig,char pos)
 {
 
   char sim[5]; // буфер для введених символів, число розкладається із кінця
-  register char i,sp=0;
+  register char i,sp=4;
   int old_val;
 
   wait_key_release();
@@ -30,7 +30,6 @@ int input_value(int v,int decdig,char pos)
   for(i=4;i>0;--i)
   {
 	byte2lcd(sim[i],1);
-	//byte2lcd(i+'0',1);
 	if(i==decdig)
 	  byte2lcd('.',1);
   }
@@ -38,12 +37,13 @@ int input_value(int v,int decdig,char pos)
 
   i=128+64+pos;
   byte2lcd(i,0); // виставили курсор в портрібну позицію.
-
-  byte2lcd(0x0F,0) ; // включити курсор
-
+  byte2lcd(0x0F,0) ; // і включити його
 
   while(1)
   {
+	  byte2lcd(sim[sp],1) ; // показати поточну цифру
+	  byte2lcd(i,0); // знову виставили курсор в портрібну позицію.
+  
 		switch(readkey())
 		{
 			case MIN:
@@ -58,20 +58,21 @@ int input_value(int v,int decdig,char pos)
 				return old_val;
 				
 			case SET:
-				if(++sp>4) // перейти до наступної цифри або якщо
+				if(--sp&0x80) // перейти до наступної цифри або якщо
 				{ // обробили всі  цифри - скласти число та завершити роботу.
 					v=0;
   	              for(i=0;i<5;++i)
     	            {
         	      	  v*=10;
-            	  	  v+=sim[i]-'0';
+            	  	  v+=sim[4-i]-'0';
               	  }
 					byte2lcd(0x0C,0); // виключити курсор
 					return v; // v попереднб
 				}
-				else // тут треба буде пересунути курсор
+				else
 				{
-				
+				  i=128+64+pos+(4-sp)+(decdig>sp?1:0); // розрахувати нову позицію
+				  byte2lcd(i,0); // знову виставили курсор в портрібну позицію.
 				}
 			}
 	
