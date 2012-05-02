@@ -178,13 +178,14 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
   if(eeprom_read_byte(pn_en))
   {
-
-	if(ai[1]>out[0]+DELTA)
+	i=eeprom_read_byte(dpp);
+	
+	if(ai[1]>out[0]+i)
 	  sbi(PORTD,DW_1); // вклюсити стравлювання
     else
 	  cbi(PORTD,DW_1);
 	
-    if(ai[1]<out[0]-DELTA)
+    if(ai[1]<out[0]-i)
   	  sbi(PORTD,UP_1); // включити набір
 	else
 		cbi(PORTD,UP_1); //
@@ -200,13 +201,14 @@ SIGNAL(SIG_OUTPUT_COMPARE1A)
 
   if(eeprom_read_byte(pn_en+1))
   {
+	i=eeprom_read_byte(dpp+1);
 
-  if(ai[3]>out[1]+DELTA)
+  if(ai[3]>out[1]+i)
 	sbi(PORTD,DW_2); // вклюсити стравлювання
   else
 	cbi(PORTD,DW_2);
 
-  if(ai[3]<out[1]-DELTA)
+  if(ai[3]<out[1]-i)
 	sbi(PORTD,UP_2); // включити набір
   else
 	cbi(PORTD,UP_2); //

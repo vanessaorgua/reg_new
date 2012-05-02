@@ -311,8 +311,42 @@ void setup_pepien(char v)
 }
 
 
+prog_char menu14[]={0xa8, 0x45, 0xa8, 0x49, 0x20, 0xb7, 0x6f, 0xbd, 0x61, 0x3a, 0x20, 0x25, 0x31, 0x64, 0x2e, 0x25, 0x30, 0x32, 0x64, 0x0}; // [0] "ПЕПІ зона: %1d.%02d"
+
+
 void setup_pepizone(char v)
 {
+  register unsigned char i;
+  register int d;
+  i=eeprom_read_byte(dpp+v); // прочитати
+  
+  while(1)
+  {
+    d=i;   // перешкалювати 200 сирих в 500 шкальованих
+	d*=5;
+    d/=2; 
+    sprintf_P(s,menu14,d/100,d%100);
+	put_lcd(s,1);
+	
+	switch(readkey())
+	{
+	  case MIN:
+		i-=10;
+		if(i>200) i=0;
+		if(i==0) i=10;
+		break;
+	  case MAX:
+		i+=10;
+		if(i>200) i=200;
+		break;
+	  case SET:
+			eeprom_write_byte(dpp+v,i);
+	  case STOP:
+		return;
+	}
 
+  
+  }
+  
 }
 

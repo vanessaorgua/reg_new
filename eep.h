@@ -15,6 +15,7 @@ extern unsigned char EEMEM rev[2];
 extern char EEMEM spd;
 
 extern char EEMEM pn_en[2]; // пневматика відключена
+extern unsigned char EEMEM dpp[2]; // // дельта для ПЕПІ
 
 
 extern unsigned char EEMEM adc_[8] ; // ={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів

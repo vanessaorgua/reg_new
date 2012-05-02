@@ -37,7 +37,7 @@ unsigned char EEMEM rev[2]={0,0};
 unsigned char EEMEM spd=1; // початкова швидкість 19200
 
 unsigned char EEMEM pn_en[2]={0,0}; // пневматика відключена
-
+unsigned char EEMEM dpp[2]={40,40}; // дельта для ПЕПІ
 
 unsigned char EEMEM adc_[8]={0x10,0x08,0x18,0x20,0x28,0x30,0x38,0x02}; // переадресація аналогових входів
 
