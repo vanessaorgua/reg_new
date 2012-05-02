@@ -2,7 +2,8 @@
 MCU=atmega32
 
 CSRC=main.c lcd.c delay.c work.c net_drv.c \
-setup.c setup_channel.c setup_system.c setup_calibr.c
+setup.c setup_channel.c setup_system.c setup_calibr.c input_value.c
+
 
 # spi.c
 TARGET = reg_new

@@ -36,6 +36,8 @@ void setup_output(char v);
 void setup_pepien(char v);
 void setup_pepizone(char v);
 
+int input_value(int v,int decdig,char pos);
+
 
 void setup_channel(char v)
 {
@@ -156,10 +158,61 @@ void setup_prez(char v)
 }
 
 
+prog_char menu12[2][6]={
+{0x4d, 0x69, 0xbd, 0x0}, // [0] "Мін"
+{0x4d, 0x61, 0xba, 0x63, 0x0} // [1] "Макс"
+};
+
 void setup_scale(char v)
 {
+  char p;
+  int hi,lo;
+  lo=eeprom_read_word(ensca[v]);
+  hi=eeprom_read_word(ensca[v]+1);
+  p=eeprom_read_byte(enprz+v);
+  wait_key_release();
+  
+  while(1)
+  {
+	switch(p)
+	{
+		default: // це якщо із єпрома прочитано якісь фігню тоді
+		  p=0;   // думати що там 0
+		case 0:
+		  sprintf_P(s,PSTR("%3d..%3d"),lo,hi);
+		  break;
+		case 1:
+		  sprintf_P(s,PSTR("%2d.%1d..%2d.%1d"),lo/10,lo%10,hi/10,hi%10);
+		  break;
+		case 2:
+		  sprintf_P(s,PSTR("%2d.%02d..%2d.%02d"),lo/100,lo%100,hi/100,hi%100);
+		
+	}
+	put_lcd(s,1);
+		switch(readkey())
+		{
+			case MIN:
+				put_lcd_P(menu12[0],1);
+				lo=input_value(lo,p,5);
+				break;
+			case MAX:
+				 put_lcd_P(menu12[1],1);
+				hi=input_value(hi,p,5);
+				break;
+				
+			case SET:
+				eeprom_write_word(ensca[v],lo);
+				eeprom_write_word(ensca[v]+1,hi);
+			case STOP:
+				return;
+			}
+	
+  }
+
 
 }
+
+
 
 prog_char modevt[2][18]={
 {0x4B,0xBB,0x61,0xBE,0x61,0xBD,0x20,0x48,0x4F,0x28,0x42,0x4F,0x29,0}, // "NO","NC"
@@ -215,8 +268,35 @@ void setup_output(char v)
 }
 
 
+prog_char pnen_msg[2][20]={
+{0xA8,0x45,0xA8,0x49,0x20,0xB3,0xB8,0xBA,0xBB,0xC6,0xC0,0x65,0xBD,0x6F,0}, // "Pnevmo enable"
+{0xA8,0x45,0xA8,0x49,0x20,0xB3,0xBA,0xBB,0xC6,0xC0,0x65,0xBD,0x6F,0} // "Pnevmo disble"
+};
+
 void setup_pepien(char v)
 {
+
+  register char i=eeprom_read_byte(pn_en+v);
+
+  while(1)
+  {
+	put_lcd_P(pnen_msg+i,1);
+
+	switch(readkey())
+	{
+	  case MIN:
+		i=0;
+		break;
+	  case MAX:
+		i=1;
+		break;
+	  case SET:
+			eeprom_write_byte(pn_en+v,i);
+	  case STOP:
+		return;
+	}
+
+  }
 
 }
 
